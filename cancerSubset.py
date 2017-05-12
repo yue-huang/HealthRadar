@@ -1,5 +1,5 @@
 # cancerSubset.py
-# usage: python3 stateCancer.py llcp_filename > output_filename
+# usage: python3 stateCancer.py llcp_filename cancerCol > output_filename
 import sys
 inputFileName = sys.argv[1]
 cancerCol = int(sys.argv[2])
