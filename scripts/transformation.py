@@ -44,15 +44,13 @@ def transformation(y, x_numerical_ordinal, x_categorical):
     return (df_transformed)
 
 
-def split_data(df, train_percentage, cv_percentage):
+def split_data(df, train_percentage):
     row_num = df.shape[0]
-    split_num1 = round(row_num * train_percentage)
-    split_num2 = round(row_num * (train_percentage + cv_percentage))
+    split_num = round(row_num * train_percentage)
     random = sample(range(row_num), k=len(range(row_num)))
-    df_train = df.iloc[random[0:split_num1]]
-    df_cv = df.iloc[random[split_num1:split_num2]]
-    df_test = df.iloc[random[split_num2:]]
-    return df_train, df_cv, df_test
+    df_train = df.iloc[random[0:split_num]]
+    df_test = df.iloc[random[split_num:]]
+    return df_train, df_test
 
 
 def main(data_csv_name, outcome_col_name, coltype_csv_name):
@@ -69,13 +67,12 @@ def main(data_csv_name, outcome_col_name, coltype_csv_name):
     print('Transforming columns...')
     df_transformed = transformation(y, x_numerical_ordinal, x_categorical)
     stats['transformed'] = [df_transformed.shape[0], df_transformed.shape[1]]
-    df_transformed.to_csv(sys.argv[1] + '_transformed2.csv', index=False)
+    df_transformed.to_csv(sys.argv[1] + '_transformed.csv', index=False)
 
     print('Splitting data...')
-    df_train, df_cv, df_test = split_data(df_transformed, 0.6, 0.2)
+    df_train, df_test = split_data(df_transformed, 0.8)
 
     stats['training_set'] = [df_train.shape[0], df_train.shape[1]]
-    stats['cv_set'] = [df_cv.shape[0], df_cv.shape[1]]
     stats['test_set'] = [df_test.shape[0], df_test.shape[1]]
 
     print('writing files...')
@@ -86,7 +83,6 @@ def main(data_csv_name, outcome_col_name, coltype_csv_name):
             writer.writerow([key] + value)
 
     df_train.to_csv(sys.argv[1] + '_transformed_train.csv', index=False)
-    df_cv.to_csv(sys.argv[1] + '_transformed_cv.csv', index=False)
     df_test.to_csv(sys.argv[1] + '_transformed_test.csv', index=False)
 
 
