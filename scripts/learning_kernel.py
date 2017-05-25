@@ -10,6 +10,8 @@
 import pandas as pd
 import numpy as np
 import sys
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn import metrics
 from sklearn import model_selection
@@ -17,6 +19,11 @@ import time
 from sklearn.linear_model import SGDClassifier
 from sklearn.kernel_approximation import RBFSampler
 from sklearn.pipeline import Pipeline
+
+# https://github.com/scikit-learn/scikit-learn/issues/6943#issuecomment-229003483
+from sklearn.externals.joblib import parallel
+parallel.MIN_IDEAL_BATCH_DURATION = 1.
+parallel.MAX_IDEAL_BATCH_DURATION = parallel.MIN_IDEAL_BATCH_DURATION * 10
 
 
 def get_X_Y_from_csv(csv_name):
@@ -53,16 +60,16 @@ def estimator_separate_train_test(train, test):
     #plot_precision_recall(Ytest, probas_[:, 1], Ypredict)
 
 def grid_search(train, test):
-    param_grid = {'rbf__gamma': np.logspace(-4, 3, 7), 'rbf__n_components': [200,1000,5000,10000],
-         'sgd__class_weight':[None, 'balanced'], 'sgd__alpha':np.logspace(-6, -1, 5)}
+    param_grid = {'rbf__gamma': np.logspace(-4, 3, 7), 'rbf__n_components': [5000],
+         'sgd__class_weight':['balanced'], 'sgd__alpha':np.logspace(-6, -1, 5)}
 
     # C_range = np.logspace(-2, 10, 13)
     #gamma_range = np.logspace(-9, 3, 13)
     #For an initial search, a logarithmic grid with basis 10 is often helpful. Using a basis of 2, a finer tuning can be achieved but at a much higher cost.
     rbf = RBFSampler()
-    sgd = SGDClassifier()
+    sgd = SGDClassifier(verbose=100)
     pipe = Pipeline(steps=[('rbf', rbf), ('sgd', sgd)])
-    clf = model_selection.GridSearchCV(pipe, param_grid=param_grid, scoring='f1', n_jobs=1, error_score=0)
+    clf = model_selection.GridSearchCV(pipe, param_grid=param_grid, scoring='f1', n_jobs=1, error_score='raise', verbose=100)
     X, Y = get_X_Y_from_csv(train)
     Xtest, Ytest = get_X_Y_from_csv(test)
     clf.fit(X, Y)
@@ -157,6 +164,8 @@ def main(train, test):
     #plot_learning_curve(train)
     print('It took %.2f seconds.' % (time.time() - start))
     #plt.show()
+    #fig.savefig('temp.png') http://stackoverflow.com/questions/4931376/generating-matplotlib-graphs-without-a-running-x-server
+
 
 
 if __name__ == '__main__':
