@@ -1,19 +1,24 @@
 # HealthRadar
-Scripts for building a web app to assess personalized disease risks
+Scripts for training a model to assess personalized cancer risks.
 
 ## Preprocessing
+Convert raw data from web to CSV file.
 ```
-preProcess.sh
-stateCancer.py
-cancerSubset.py
+raw_to_csv.py
 ```
-
-## Data visualization
+Select and modify features based on manual curation and missing data.
 ```
-stateFrequency.r
+preprocessing.py
+```
+Scale numerical data, convert categorical data to binary data.
+```
+transformation.py
 ```
 
 ## Model fitting
+Train model using stochastic gradient descent (logistic regression and linear SVM), logistic regression, and kernel approximation + linear SVM.
 ```
-fitModel.r
+learning_SGD.py
+learning_LR.py
+learning_kernel.py
 ```
